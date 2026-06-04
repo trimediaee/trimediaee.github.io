@@ -644,6 +644,7 @@ function renderWeather(data, aqData) {
   uvPill.style.color = uvColor;
   document.getElementById('uvBar').style.width = `${Math.min(uv/12*100,100)}%`;
   document.getElementById('uvBar').style.background = uvColor;
+ console.log('UV: ' + uv);
 
   // AQI
   if (aqData && aqData.current) {
