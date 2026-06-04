@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Operations — Weather Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0b0f14;
+    --surface:   #111820;
+    --surface2:  #1a2230;
+    --border:    rgba(255,255,255,0.08);
+    --border2:   rgba(255,255,255,0.14);
+    --text:      #dde6f0;
+    --muted:     #6b7f96;
+    --accent:    #f5a623;
+    --blue:      #4ea8de;
+    --green:     #52d68a;
+    --red:       #f26b6b;
+    --purple:    #b98ef7;
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    overflow: hidden;
+  }
+
+  .dash {
+    display: grid;
+    grid-template-rows: 64px 1fr 150px;
+    gap: 10px;
+    padding: 12px 16px;
+    height: 100vh;
+    min-height: 600px;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+  .org-tag {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .location-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+  }
+  .location-name small {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    display: block;
+    letter-spacing: 0.05em;
+  }
+  .topbar-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .clock {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+  .date-str {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── ALERT BAR ── */
+  .alert-banner {
+    display: none;
+    background: rgba(245,166,35,0.1);
+    border: 1px solid rgba(245,166,35,0.4);
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .alert-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── MAIN GRID ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr 200px;
+    gap: 10px;
+  }
+
+  /* ── PANELS ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ── CURRENT CONDITIONS ── */
+  .current-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .temp-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 18px 14px;
+  }
+  .temp-icon {
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .temp-value {
+    font-family: var(--font-mono);
+    font-size: 72px;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .temp-unit { font-size: 28px; vertical-align: super; }
+  .temp-cond {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
+  .temp-feels {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .temp-hilo {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .temp-hilo b { color: var(--text); }
+
+  .sun-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .sun-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+  }
+  .sun-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .sun-val { font-family: var(--font-mono); font-size: 16px; color: var(--accent); margin-top: 2px; }
+
+  /* ── CENTER: RADAR ── */
+  .center-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .radar-panel {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .radar-header {
+    padding: 10px 14px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .radar-link {
+    font-size: 11px;
+    color: var(--blue);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    opacity: 0.8;
+  }
+  .radar-link:hover { opacity: 1; }
+  .radar-frame {
+    flex: 1;
+    border: none;
+    width: 100%;
+  }
+
+  .hourly-row {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .hr-cell {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 4px;
+    text-align: center;
+  }
+  .hr-time { font-size: 10px; color: var(--muted); }
+  .hr-icon { font-size: 16px; margin: 4px 0 2px; }
+  .hr-temp { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
+  .hr-pop { font-size: 10px; color: var(--blue); margin-top: 2px; }
+
+  /* ── RIGHT: METRICS ── */
+  .metrics-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 13px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+  }
+  .metric-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .m-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .m-val { font-family: var(--font-mono); font-size: 20px; font-weight: 500; color: var(--text); }
+  .m-sub { font-size: 11px; color: var(--muted); }
+  .pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .pill-green { background: rgba(82,214,138,0.15); color: var(--green); }
+  .pill-yellow { background: rgba(245,166,35,0.15); color: var(--accent); }
+  .pill-red { background: rgba(242,107,107,0.15); color: var(--red); }
+  .pill-blue { background: rgba(78,168,222,0.15); color: var(--blue); }
+
+  .bar-track {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+
+  /* ── FORECAST STRIP ── */
+  .forecast-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+  .fc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 6px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .fc.today { border-color: var(--accent); }
+  .fc-dow { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .fc-date { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .fc-icon { font-size: 22px; margin: 6px 0 4px; line-height: 1; }
+  .fc-hi { font-family: var(--font-mono); font-size: 16px; color: var(--text); }
+  .fc-lo { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .fc-pop { font-size: 11px; margin-top: 4px; }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    z-index: 999;
+    transition: opacity 0.6s ease;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .loading-logo { font-size: 13px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+  .loading-spin {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--red);
+    text-align: center;
+    padding: 8px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">Field Operations Weather</div>
+  <div class="loading-spin"></div>
+</div>
+
+<div class="dash">
+
+  <!-- TOP BAR -->
+  <div>
+    <div class="topbar">
+      <div>
+        <div class="org-tag">Field Operations</div>
+        <div id="alertBanner" class="alert-banner">
+          <div class="alert-dot"></div>
+          <span id="alertText"></span>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div class="location-name">
+          Marquette, MI
+          <small>46.5436° N, 87.3954° W &nbsp;·&nbsp; Elevation 688 ft</small>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="clock" id="clock">--:-- --</div>
+        <div class="date-str" id="dateStr">---</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT: CURRENT -->
+    <div class="current-col">
+      <div class="panel temp-panel" style="flex:1;">
+        <div class="temp-icon" id="condIcon">🌤️</div>
+        <div class="temp-value"><span id="tempNow">--</span><span class="temp-unit">°F</span></div>
+        <div class="temp-cond" id="condText">Loading…</div>
+        <div class="temp-feels" id="feelsLike">Feels like --°F</div>
+        <div class="temp-hilo" id="hiLo"><b>H: --°F</b> &nbsp; L: --°F</div>
+        <div class="error-msg" id="apiError">Unable to load weather data.<br>Check internet connection.</div>
+      </div>
+      <div class="sun-row">
+        <div class="sun-card">
+          <div class="sun-lbl">🌅 Sunrise</div>
+          <div class="sun-val" id="sunriseVal">--:--</div>
+        </div>
+        <div class="sun-card">
+          <div class="sun-lbl">🌇 Sunset</div>
+          <div class="sun-val" id="sunsetVal">--:--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: RADAR + HOURLY -->
+    <div class="center-col">
+      <div class="radar-panel">
+        <div class="radar-header">
+          <span class="panel-label" style="margin:0;">📡 Live Radar — Upper Michigan</span>
+          <a class="radar-link" href="https://radar.weather.gov/station/KMQT/standard" target="_blank">NWS KMQT ↗</a>
+        </div>
+        <iframe class="radar-frame"
+          src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=°F&metricWind=mph&zoom=7&overlay=rain&product=ecmwf&level=surface&lat=46.54&lon=-87.40&detailLat=46.54&detailLon=-87.40&detail=false&pressure=false&message=false"
+          title="Live weather radar centered on Marquette MI"
+          loading="lazy">
+        </iframe>
+      </div>
+      <div class="hourly-row" id="hourlyRow">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- RIGHT: METRICS -->
+    <div class="metrics-col">
+
+      <div class="metric">
+        <div class="metric-top">
+          <span class="m-label">💨 Wind</span>
+          <span class="m-val" id="windSpeed">--</span>
+        </div>
+        <div class="m-sub" id="windDir">Direction loading…</div>
+        <div class="m-sub" id="windGust" style="color:var(--red);"></div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-top">
+          <span class="m-label">💧 Humidity</span>
+          <span class="m-val" id="humidVal">--%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="humidBar" style="width:0%;background:var(--blue);"></div>
+        </div>
+        <div class="m-sub" id="dewPt">Dew point: --°F</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-top">
+          <span class="m-label">🌿 Air Quality (AQI)</span>
+          <span class="pill pill-green" id="aqiPill">Good</span>
+        </div>
+        <div class="m-val" id="aqiVal">--</div>
+        <div class="m-sub" id="aqiSub">Loading AQI…</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-top">
+          <span class="m-label">☀️ UV Index</span>
+          <span class="pill" id="uvPill" style="background:rgba(82,214,138,0.15);color:var(--green);">Low</span>
+        </div>
+        <div class="m-val" id="uvVal">--</div>
+        <div class="bar-track" style="margin-top:6px;">
+          <div class="bar-fill" id="uvBar" style="width:0%;background:var(--green);"></div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-top">
+          <span class="m-label">🌡️ Pressure</span>
+          <span class="m-val" id="pressVal">--</span>
+        </div>
+        <div class="m-sub" id="pressTrend">Loading…</div>
+      </div>
+
+      <div class="metric" style="background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.2);">
+        <div class="m-label">⏱️ Last Updated</div>
+        <div style="font-family:var(--font-mono);font-size:13px;color:var(--accent);" id="lastUpdated">--:-- --</div>
+        <div class="m-sub">Auto-refresh every 10 min</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 7-DAY FORECAST -->
+  <div>
+    <div class="panel-label" style="padding:0 2px 6px;">📅 7-Day Forecast</div>
+    <div class="forecast-row" id="forecastRow">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const LAT = 46.5436;
+const LON = -87.3954;
+const REFRESH_MS = 10 * 60 * 1000; // 10 minutes
+
+// ─── WMO CODE → label + emoji ─────────────────────────────
+function wmoLabel(c) {
+  if (c === 0) return ['Clear Sky', '☀️'];
+  if (c <= 2)  return ['Partly Cloudy', '🌤️'];
+  if (c === 3) return ['Overcast', '☁️'];
+  if (c <= 49) return ['Foggy', '🌫️'];
+  if (c <= 59) return ['Drizzle', '🌦️'];
+  if (c <= 69) return ['Rain', '🌧️'];
+  if (c <= 79) return ['Snow', '❄️'];
+  if (c <= 82) return ['Rain Showers', '🌦️'];
+  if (c <= 86) return ['Snow Showers', '🌨️'];
+  if (c <= 99) return ['Thunderstorm', '⛈️'];
+  return ['Unknown', '🌡️'];
+}
+
+function fmtTime(isoStr) {
+  const d = new Date(isoStr);
+  let h = d.getHours(), m = d.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+function toF(c) { return Math.round(c * 9/5 + 32); }
+function toInHg(hPa) { return (hPa * 0.02953).toFixed(2); }
+
+function windDirLabel(deg) {
+  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return dirs[Math.round(deg/22.5) % 16];
+}
+
+function aqiFromPm25(pm) {
+  // Simple AQI from PM2.5 (EPA linear interpolation, simplified)
+  if (pm <= 12)   return Math.round((50/12)*pm);
+  if (pm <= 35.4) return Math.round(50 + (50/23.4)*(pm-12));
+  if (pm <= 55.4) return Math.round(100 + (50/20)*(pm-35.4));
+  if (pm <= 150.4)return Math.round(150 + (50/94.6)*(pm-55.4));
+  return Math.round(200 + (100/99.6)*(pm-150.4));
+}
+
+function aqiLabel(aqi) {
+  if (aqi <= 50)  return ['Good', 'pill-green'];
+  if (aqi <= 100) return ['Moderate', 'pill-yellow'];
+  if (aqi <= 150) return ['Unhealthy for Sensitive', 'pill-yellow'];
+  return ['Unhealthy', 'pill-red'];
+}
+
+function uvLabel(uv) {
+  if (uv <= 2)  return ['Low', 'green', 'var(--green)'];
+  if (uv <= 5)  return ['Moderate', 'yellow', 'var(--accent)'];
+  if (uv <= 7)  return ['High', 'yellow', 'var(--accent)'];
+  if (uv <= 10) return ['Very High', 'red', 'var(--red)'];
+  return ['Extreme', 'red', 'var(--red)'];
+}
+
+const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ─── CLOCK ────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = h % 12 || 12;
+  document.getElementById('clock').textContent = `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
+  document.getElementById('dateStr').textContent =
+    `${days[now.getDay()]} · ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── FETCH WEATHER (Open-Meteo, no key needed) ────────────
+async function fetchWeather() {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}`
+    + `&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,uv_index`
+    + `&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,uv_index_max`
+    + `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America/Chicago&forecast_days=7`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Weather fetch failed');
+  return res.json();
+}
+
+// Fetch AQI from Open-Meteo Air Quality (also free, no key)
+async function fetchAQ() {
+  const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LON}&current=pm2_5,us_aqi`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('AQ fetch failed');
+  return res.json();
+}
+
+// ─── RENDER ───────────────────────────────────────────────
+function renderWeather(data, aqData) {
+  const c = data.current;
+  const d = data.daily;
+  const h = data.hourly;
+
+  // Current temp & conditions
+  const [condLabel, condEmoji] = wmoLabel(c.weather_code);
+  document.getElementById('condIcon').textContent = condEmoji;
+  document.getElementById('tempNow').textContent = Math.round(c.temperature_2m);
+  document.getElementById('condText').textContent = condLabel;
+  document.getElementById('feelsLike').textContent = `Feels like ${Math.round(c.apparent_temperature)}°F`;
+  document.getElementById('hiLo').innerHTML =
+    `<b>H: ${Math.round(d.temperature_2m_max[0])}°F</b> &nbsp; L: ${Math.round(d.temperature_2m_min[0])}°F`;
+
+  // Sunrise / Sunset
+  document.getElementById('sunriseVal').textContent = fmtTime(d.sunrise[0]);
+  document.getElementById('sunsetVal').textContent  = fmtTime(d.sunset[0]);
+
+  // Wind
+  const wspd = Math.round(c.wind_speed_10m);
+  const wdir = windDirLabel(c.wind_direction_10m);
+  document.getElementById('windSpeed').textContent = `${wspd} mph`;
+  document.getElementById('windDir').textContent = `From ${wdir} (${Math.round(c.wind_direction_10m)}°)`;
+  const gusts = Math.round(c.wind_gusts_10m);
+  document.getElementById('windGust').textContent = gusts > wspd + 5 ? `⚠ Gusts to ${gusts} mph` : '';
+
+  // Humidity + dew point estimate
+  const rh = Math.round(c.relative_humidity_2m);
+  document.getElementById('humidVal').textContent = `${rh}%`;
+  document.getElementById('humidBar').style.width = `${rh}%`;
+  const dp = Math.round(c.temperature_2m - ((100-rh)/5));
+  document.getElementById('dewPt').textContent = `Dew point: ${dp}°F`;
+
+  // Pressure
+  const pInHg = toInHg(c.surface_pressure);
+  document.getElementById('pressVal').textContent = `${pInHg} inHg`;
+  const pMb = c.surface_pressure;
+  document.getElementById('pressTrend').textContent =
+    pMb > 1015 ? '↑ High pressure — stable' :
+    pMb > 1000 ? '→ Normal range' :
+    '↓ Low pressure — unsettled';
+
+  // UV
+  const uv = Math.round(c.uv_index);
+  const [uvLbl, , uvColor] = uvLabel(uv);
+  document.getElementById('uvVal').textContent = uv;
+  const uvPill = document.getElementById('uvPill');
+  uvPill.textContent = uvLbl;
+  uvPill.style.color = uvColor;
+  document.getElementById('uvBar').style.width = `${Math.min(uv/12*100,100)}%`;
+  document.getElementById('uvBar').style.background = uvColor;
+
+  // AQI
+  if (aqData && aqData.current) {
+    const aqi = Math.round(aqData.current.us_aqi || aqiFromPm25(aqData.current.pm2_5 || 0));
+    const pm = (aqData.current.pm2_5 || 0).toFixed(1);
+    const [aLabel, aPillClass] = aqiLabel(aqi);
+    document.getElementById('aqiVal').textContent = aqi;
+    const pill = document.getElementById('aqiPill');
+    pill.textContent = aLabel;
+    pill.className = `pill ${aPillClass}`;
+    document.getElementById('aqiSub').textContent = `PM2.5: ${pm} μg/m³`;
+  } else {
+    document.getElementById('aqiVal').textContent = 'N/A';
+    document.getElementById('aqiSub').textContent = 'AQI data unavailable';
+  }
+
+  // Last updated
+  const now = new Date();
+  const h2 = now.getHours(), mm = now.getMinutes();
+  const ap = h2 >= 12 ? 'PM' : 'AM';
+  document.getElementById('lastUpdated').textContent =
+    `${h2%12||12}:${String(mm).padStart(2,'0')} ${ap}`;
+
+  // Alert check
+  const alertBanner = document.getElementById('alertBanner');
+  const maxPop = Math.max(...d.precipitation_probability_max.slice(0,3));
+  const hasSevere = d.weather_code.slice(0,3).some(w => w >= 95);
+  const highWind = data.daily && c.wind_gusts_10m > 35;
+  if (hasSevere) {
+    alertBanner.style.display = 'flex';
+    document.getElementById('alertText').textContent =
+      'Thunderstorm conditions possible in the forecast period — review field schedules';
+  } else if (highWind) {
+    alertBanner.style.display = 'flex';
+    document.getElementById('alertText').textContent =
+      `High wind gusts up to ${Math.round(c.wind_gusts_10m)} mph — assess outdoor work safety`;
+  } else if (maxPop >= 80) {
+    alertBanner.style.display = 'flex';
+    document.getElementById('alertText').textContent =
+      `Heavy precipitation likely (${maxPop}% chance) in next 3 days — plan field access accordingly`;
+  } else {
+    alertBanner.style.display = 'none';
+  }
+
+  // Hourly (next 8 hours)
+  const nowHour = new Date().getHours();
+  const hrRow = document.getElementById('hourlyRow');
+  let hrHtml = '';
+  let count = 0;
+  for (let i = 0; i < h.time.length && count < 8; i++) {
+    const hDate = new Date(h.time[i]);
+    if (hDate.getHours() >= nowHour || count > 0) {
+      const [, em] = wmoLabel(h.weather_code[i]);
+      const hh2 = hDate.getHours();
+      const ap2 = hh2 >= 12 ? 'p' : 'a';
+      const label = hh2 % 12 || 12;
+      const pop = h.precipitation_probability[i] || 0;
+      hrHtml += `<div class="hr-cell">
+        <div class="hr-time">${label}${ap2}</div>
+        <div class="hr-icon">${em}</div>
+        <div class="hr-temp">${Math.round(h.temperature_2m[i])}°</div>
+        ${pop > 10 ? `<div class="hr-pop">${pop}%</div>` : '<div class="hr-pop" style="color:transparent">0%</div>'}
+      </div>`;
+      count++;
+    }
+  }
+  hrRow.innerHTML = hrHtml;
+
+  // 7-Day Forecast
+  const fcRow = document.getElementById('forecastRow');
+  let fcHtml = '';
+  for (let i = 0; i < 7; i++) {
+    const fcDate = new Date(d.time[i] + 'T12:00:00');
+    const dow = i === 0 ? 'Today' : days[fcDate.getDay()];
+    const dateLabel = `${months[fcDate.getMonth()]} ${fcDate.getDate()}`;
+    const [, fcEm] = wmoLabel(d.weather_code[i]);
+    const pop = d.precipitation_probability_max[i] || 0;
+    const popColor = pop >= 70 ? 'var(--red)' : pop >= 40 ? 'var(--accent)' : 'var(--blue)';
+    fcHtml += `<div class="fc ${i===0?'today':''}">
+      <div class="fc-dow">${dow}</div>
+      <div class="fc-date">${dateLabel}</div>
+      <div class="fc-icon">${fcEm}</div>
+      <div class="fc-hi">${Math.round(d.temperature_2m_max[i])}°</div>
+      <div class="fc-lo">${Math.round(d.temperature_2m_min[i])}°</div>
+      <div class="fc-pop" style="color:${pop>5?popColor:'var(--muted)'}">${pop>5?pop+'%':'—'}</div>
+    </div>`;
+  }
+  fcRow.innerHTML = fcHtml;
+}
+
+// ─── LOAD + SCHEDULE ──────────────────────────────────────
+async function loadAll() {
+  try {
+    document.getElementById('apiError').style.display = 'none';
+    const [wData, aqData] = await Promise.allSettled([fetchWeather(), fetchAQ()]);
+    if (wData.status === 'rejected') throw wData.reason;
+    renderWeather(wData.value, aqData.status === 'fulfilled' ? aqData.value : null);
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  } catch (err) {
+    console.error(err);
+    document.getElementById('apiError').style.display = 'block';
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+}
+
+loadAll();
+setInterval(loadAll, REFRESH_MS);
+</script>
+</body>
+</html>
