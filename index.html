@@ -637,7 +637,7 @@ function renderWeather(data, aqData) {
     '↓ Low pressure — unsettled';
 
   // UV
-  const uv = Math.round(c.uv_index);
+  const uv = Math.round(c.uv_index_max);
   const [uvLbl, , uvColor] = uvLabel(uv);
   document.getElementById('uvVal').textContent = uv;
   const uvPill = document.getElementById('uvPill');
