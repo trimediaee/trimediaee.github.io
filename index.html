@@ -576,10 +576,11 @@ updateClock();
 
 // ─── FETCH WEATHER (Open-Meteo, no key needed) ────────────
 async function fetchWeather() {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}`
-    + `&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,uv_index`
-    + `&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,uv_index_max`
-    + `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America/Chicago&forecast_days=7`;
+  const url = 'https://api.open-meteo.com/v1/forecast?latitude=46.5436&longitude=-87.3954'
+    + '&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,uv_index_max'
+    + '&hourly=temperature_2m,weather_code,precipitation_probability'
+    + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure'
+    + '&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch';
   const res = await fetch(url);
   if (!res.ok) throw new Error('Weather fetch failed');
   return res.json();
@@ -587,7 +588,7 @@ async function fetchWeather() {
 
 // Fetch AQI from Open-Meteo Air Quality (also free, no key)
 async function fetchAQ() {
-  const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${LAT}&longitude=${LON}&current=pm2_5,us_aqi`;
+  const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=46.5436&longitude=-87.3954&current=us_aqi,pm2_5&timezone=America%2FNew_York`;
   const res = await fetch(url);
   if (!res.ok) throw new Error('AQ fetch failed');
   return res.json();
