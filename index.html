@@ -636,7 +636,7 @@ function renderWeather(data, aqData) {
     '↓ Low pressure — unsettled';
 
   // UV
-  const uv = Math.round(c.uv_index);
+  const uv = Math.round(aqData.uv_index);
   const [uvLbl, , uvColor] = uvLabel(uv);
   document.getElementById('uvVal').textContent = uv;
   const uvPill = document.getElementById('uvPill');
@@ -644,8 +644,8 @@ function renderWeather(data, aqData) {
   uvPill.style.color = uvColor;
   document.getElementById('uvBar').style.width = `${Math.min(uv/12*100,100)}%`;
   document.getElementById('uvBar').style.background = uvColor;
- console.log('UV Not Rounded: ' + c.uv_index);
- console.log('UV: ' + uv);
+  console.log('UV Not Rounded: ' + aqData.uv_index);
+  console.log('UV: ' + uv);
 
   // AQI
   if (aqData && aqData.current) {
