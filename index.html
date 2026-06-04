@@ -703,7 +703,7 @@ function renderWeather(data, aqData) {
       const label = hh2 % 12 || 12;
       const pop = h.precipitation_probability[i] || 0;
       hrHtml += `<div class="hr-cell">
-        <div class="hr-time">${label}${ap2}:00</div>
+        <div class="hr-time">${label}:00 ${ap2}</div>
         <div class="hr-icon">${em}</div>
         <div class="hr-temp">${Math.round(h.temperature_2m[i])}°</div>
         ${pop > 10 ? `<div class="hr-pop">${pop}%</div>` : '<div class="hr-pop" style="color:transparent">0%</div>'}
