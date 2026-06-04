@@ -249,7 +249,7 @@
     padding: 7px 4px;
     text-align: center;
   }
-  .hr-time { font-size: 10px; color: var(--muted); }
+  .hr-time { font-size: 13px; color: var(--muted); }
   .hr-icon { font-size: 16px; margin: 4px 0 2px; }
   .hr-temp { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
   .hr-pop { font-size: 10px; color: var(--blue); margin-top: 2px; }
@@ -700,11 +700,11 @@ function renderWeather(data, aqData) {
     if (hDate.getHours() >= nowHour || count > 0) {
       const [, em] = wmoLabel(h.weather_code[i]);
       const hh2 = hDate.getHours();
-      const ap2 = hh2 >= 12 ? 'p' : 'a';
+      const ap2 = hh2 >= 12 ? 'pm' : 'am';
       const label = hh2 % 12 || 12;
       const pop = h.precipitation_probability[i] || 0;
       hrHtml += `<div class="hr-cell">
-        <div class="hr-time">${label}${ap2}</div>
+        <div class="hr-time">${label}${ap2}:00</div>
         <div class="hr-icon">${em}</div>
         <div class="hr-temp">${Math.round(h.temperature_2m[i])}°</div>
         ${pop > 10 ? `<div class="hr-pop">${pop}%</div>` : '<div class="hr-pop" style="color:transparent">0%</div>'}
