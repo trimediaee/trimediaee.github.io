@@ -645,10 +645,6 @@ function renderWeather(data, aqData) {
    uvPill.style.color = uvColor;
    document.getElementById('uvBar').style.width = `${Math.min(uv/12*100,100)}%`;
    document.getElementById('uvBar').style.background = uvColor;
-   console.log('UV Not Rounded: ' + aqData.uv_index);
-   console.log('UV: ' + uv);
-   console.log('aqData.uv_index: ' + aqData.uv_index);
-   console.log('aqData.current.uv_index: ' + aqData.current.uv_index);
  } else {
    document.getElementById('uvVal').textContent = 'Error';
  }
