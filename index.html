@@ -646,6 +646,7 @@ function renderWeather(data, aqData) {
   document.getElementById('uvBar').style.background = uvColor;
   console.log('UV Not Rounded: ' + aqData.uv_index);
   console.log('UV: ' + uv);
+  console.log('aqData.uv_index: ' + aqData.uv_index);
 
   // AQI
   if (aqData && aqData.current) {
