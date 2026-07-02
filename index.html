@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1920, initial-scale=1.0">
 <title>Field Operations — Weather Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -27,7 +28,8 @@
   }
 
   html, body {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-head);
@@ -51,18 +53,21 @@
     border-bottom: 1px solid var(--border);
     padding-bottom: 10px;
   }
+
   .org-tag {
     font-size: 13px;
     letter-spacing: 0.15em;
     color: var(--muted);
     text-transform: uppercase;
   }
+
   .location-name {
     font-size: 24px;
     font-weight: 700;
     color: var(--text);
     text-align: center;
   }
+
   .location-name small {
     font-size: 14px;
     font-weight: 400;
@@ -70,12 +75,14 @@
     display: block;
     letter-spacing: 0.05em;
   }
+
   .topbar-right {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 2px;
   }
+
   .clock {
     font-family: var(--font-mono);
     font-size: 30px;
@@ -83,6 +90,7 @@
     color: var(--text);
     letter-spacing: 0.04em;
   }
+
   .date-str {
     font-size: 14px;
     color: var(--muted);
@@ -103,19 +111,25 @@
     gap: 8px;
     margin-bottom: 0;
   }
+
   .alert-dot {
-    width: 7px; height: 7px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--accent);
     flex-shrink: 0;
     animation: pulse 2s ease-in-out infinite;
   }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
 
   /* ── MAIN GRID ── */
   .main-grid {
     display: grid;
-    grid-template-columns: 240px 1fr 220px;
+    grid-template-columns: 300px 1fr 300px;
     gap: 10px;
   }
 
@@ -128,6 +142,7 @@
     position: relative;
     overflow: hidden;
   }
+
   .panel-label {
     font-size: 13px;
     letter-spacing: 0.12em;
@@ -141,6 +156,7 @@
     flex-direction: column;
     gap: 10px;
   }
+
   .temp-panel {
     flex: 1;
     display: flex;
@@ -150,11 +166,13 @@
     text-align: center;
     padding: 18px 14px;
   }
+
   .temp-icon {
     font-size: 56px;
     line-height: 1;
     margin-bottom: 6px;
   }
+
   .temp-value {
     font-family: var(--font-mono);
     font-size: 80px;
@@ -163,7 +181,12 @@
     line-height: 1;
     letter-spacing: -2px;
   }
-  .temp-unit { font-size: 32px; vertical-align: super; }
+
+  .temp-unit {
+    font-size: 32px;
+    vertical-align: super;
+  }
+
   .temp-cond {
     font-size: 18px;
     font-weight: 700;
@@ -171,23 +194,29 @@
     margin-top: 8px;
     letter-spacing: 0.03em;
   }
+
   .temp-feels {
     font-size: 15px;
     color: var(--muted);
     margin-top: 4px;
   }
+
   .temp-hilo {
     font-size: 15px;
     color: var(--muted);
     margin-top: 6px;
   }
-  .temp-hilo b { color: var(--text); }
+
+  .temp-hilo b {
+    color: var(--text);
+  }
 
   .sun-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
+
   .sun-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -195,31 +224,54 @@
     padding: 10px;
     text-align: center;
   }
-  .sun-lbl { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
-  .sun-val { font-family: var(--font-mono); font-size: 18px; color: var(--accent); margin-top: 3px; }
 
-  /* ── CENTER: RADAR ── */
+  .sun-lbl {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .sun-val {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    color: var(--accent);
+    margin-top: 3px;
+  }
+
+  /* ── CENTER: RADAR / SIGNAGE TARGET ── */
   .center-col {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
+
   .radar-panel {
-    flex: 1;
+    width: 1200px;
+    height: 675px;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    margin: 0 auto;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 2px dashed rgba(255,255,255,0.18);
     border-radius: 12px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
+
   .radar-header {
+    height: 42px;
     padding: 10px 14px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    background: rgba(11,15,20,0.82);
+    z-index: 2;
   }
+
   .radar-link {
     font-size: 13px;
     color: var(--blue);
@@ -227,11 +279,39 @@
     letter-spacing: 0.03em;
     opacity: 0.8;
   }
-  .radar-link:hover { opacity: 1; }
+
+  .radar-link:hover {
+    opacity: 1;
+  }
+
   .radar-frame {
     flex: 1;
     border: none;
     width: 100%;
+    height: 100%;
+  }
+
+  .signage-guide {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.28);
+    font-family: var(--font-mono);
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+  }
+
+  .signage-guide span {
+    background: rgba(11,15,20,0.55);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 12px 18px;
   }
 
   /* ── HOURLY STRIP ── */
@@ -241,6 +321,7 @@
     gap: 6px;
     flex-shrink: 0;
   }
+
   .hr-cell {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -248,10 +329,28 @@
     padding: 8px 4px;
     text-align: center;
   }
-  .hr-time { font-size: 14px; color: var(--muted); }
-  .hr-icon { font-size: 20px; margin: 5px 0 3px; }
-  .hr-temp { font-family: var(--font-mono); font-size: 16px; color: var(--text); }
-  .hr-pop  { font-size: 13px; color: var(--blue); margin-top: 3px; }
+
+  .hr-time {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .hr-icon {
+    font-size: 20px;
+    margin: 5px 0 3px;
+  }
+
+  .hr-temp {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .hr-pop {
+    font-size: 13px;
+    color: var(--blue);
+    margin-top: 3px;
+  }
 
   /* ── RIGHT: METRICS ── */
   .metrics-col {
@@ -259,6 +358,7 @@
     flex-direction: column;
     gap: 8px;
   }
+
   .metric {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -270,14 +370,31 @@
     justify-content: center;
     gap: 4px;
   }
+
   .metric-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-  .m-label { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
-  .m-val   { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: var(--text); }
-  .m-sub   { font-size: 13px; color: var(--muted); }
+
+  .m-label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .m-val {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .m-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
 
   .pill {
     font-size: 11px;
@@ -287,6 +404,7 @@
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
+
   .pill-green  { background: rgba(82,214,138,0.15);  color: var(--green); }
   .pill-yellow { background: rgba(245,166,35,0.15);  color: var(--accent); }
   .pill-red    { background: rgba(242,107,107,0.15); color: var(--red); }
@@ -299,7 +417,12 @@
     overflow: hidden;
     margin-top: 4px;
   }
-  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
 
   /* ── FORECAST STRIP ── */
   .forecast-row {
@@ -307,6 +430,7 @@
     grid-template-columns: repeat(7, 1fr);
     gap: 8px;
   }
+
   .fc {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -315,33 +439,85 @@
     text-align: center;
     transition: border-color 0.2s;
   }
-  .fc.today { border-color: var(--accent); }
-  .fc-dow  { font-size: 13px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
-  .fc-date { font-size: 12px; color: var(--muted); margin-top: 1px; }
-  .fc-icon { font-size: 26px; margin: 6px 0 5px; line-height: 1; }
-  .fc-hi   { font-family: var(--font-mono); font-size: 18px; color: var(--text); }
-  .fc-lo   { font-family: var(--font-mono); font-size: 14px; color: var(--muted); }
-  .fc-pop  { font-size: 13px; margin-top: 4px; }
+
+  .fc.today {
+    border-color: var(--accent);
+  }
+
+  .fc-dow {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .fc-date {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .fc-icon {
+    font-size: 26px;
+    margin: 6px 0 5px;
+    line-height: 1;
+  }
+
+  .fc-hi {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  .fc-lo {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .fc-pop {
+    font-size: 13px;
+    margin-top: 4px;
+  }
 
   /* ── LOADING ── */
   .loading-overlay {
-    position: fixed; inset: 0;
+    position: fixed;
+    inset: 0;
     background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
     z-index: 999;
     transition: opacity 0.6s ease;
   }
-  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
-  .loading-logo { font-size: 15px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; }
+
+  .loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loading-logo {
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
   .loading-spin {
-    width: 32px; height: 32px;
+    width: 32px;
+    height: 32px;
     border: 2px solid var(--border2);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.9s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 
   .error-msg {
     font-size: 14px;
@@ -352,6 +528,7 @@
   }
 </style>
 </head>
+
 <body>
 
 <div class="loading-overlay" id="loadingOverlay">
@@ -371,12 +548,14 @@
           <span id="alertText"></span>
         </div>
       </div>
+
       <div style="text-align:center;">
         <div class="location-name">
           Marquette, MI
           <small>46.5436° N, 87.3954° W &nbsp;·&nbsp; Elevation 688 ft</small>
         </div>
       </div>
+
       <div class="topbar-right">
         <div class="clock" id="clock">--:-- --</div>
         <div class="date-str" id="dateStr">---</div>
@@ -391,12 +570,18 @@
     <div class="current-col">
       <div class="panel temp-panel" style="flex:1;">
         <div class="temp-icon" id="condIcon">🌤️</div>
-        <div class="temp-value"><span id="tempNow">--</span><span class="temp-unit">°F</span></div>
+        <div class="temp-value">
+          <span id="tempNow">--</span><span class="temp-unit">°F</span>
+        </div>
         <div class="temp-cond" id="condText">Loading…</div>
         <div class="temp-feels" id="feelsLike">Feels like --°F</div>
         <div class="temp-hilo" id="hiLo"><b>H: --°F</b> &nbsp; L: --°F</div>
-        <div class="error-msg" id="apiError">Unable to load weather data.<br>Check internet connection.</div>
+        <div class="error-msg" id="apiError">
+          Unable to load weather data.<br>
+          Check internet connection.
+        </div>
       </div>
+
       <div class="sun-row">
         <div class="sun-card">
           <div class="sun-lbl">🌅 Sunrise</div>
@@ -409,19 +594,25 @@
       </div>
     </div>
 
-    <!-- CENTER: RADAR + HOURLY -->
+    <!-- CENTER: RADAR BACKGROUND + YODECK SIGNAGE OVERLAY TARGET -->
     <div class="center-col">
-      <div class="radar-panel">
+      <div class="radar-panel" id="signageWindow">
         <div class="radar-header">
           <span class="panel-label" style="margin:0;">📡 Live Radar — Upper Michigan</span>
           <a class="radar-link" href="https://radar.weather.gov/station/KMQT/standard" target="_blank">NWS KMQT ↗</a>
         </div>
+
         <iframe class="radar-frame"
           src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=°F&metricWind=mph&zoom=8&overlay=rain&product=ecmwf&level=surface&lat=46.54&lon=-87.40&detailLat=46.54&detailLon=-87.40&detail=false&pressure=false&message=false"
           title="Live weather radar centered on Marquette MI"
           loading="lazy">
         </iframe>
+
+        <div class="signage-guide">
+          <span>YODECK SIGNAGE OVERLAY AREA<br>1200 × 675</span>
+        </div>
       </div>
+
       <div class="hourly-row" id="hourlyRow">
         <!-- filled by JS -->
       </div>
@@ -526,20 +717,21 @@ function fmtTime(isoStr) {
   return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
-function toF(c) { return Math.round(c * 9/5 + 32); }
-function toInHg(hPa) { return (hPa * 0.02953).toFixed(2); }
+function toInHg(hPa) {
+  return (hPa * 0.02953).toFixed(2);
+}
 
 function windDirLabel(deg) {
   const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-  return dirs[Math.round(deg/22.5) % 16];
+  return dirs[Math.round(deg / 22.5) % 16];
 }
 
 function aqiFromPm25(pm) {
-  if (pm <= 12)    return Math.round((50/12)*pm);
-  if (pm <= 35.4)  return Math.round(50 + (50/23.4)*(pm-12));
-  if (pm <= 55.4)  return Math.round(100 + (50/20)*(pm-35.4));
-  if (pm <= 150.4) return Math.round(150 + (50/94.6)*(pm-55.4));
-  return Math.round(200 + (100/99.6)*(pm-150.4));
+  if (pm <= 12)    return Math.round((50 / 12) * pm);
+  if (pm <= 35.4)  return Math.round(50 + (50 / 23.4) * (pm - 12));
+  if (pm <= 55.4)  return Math.round(100 + (50 / 20) * (pm - 35.4));
+  if (pm <= 150.4) return Math.round(150 + (50 / 94.6) * (pm - 55.4));
+  return Math.round(200 + (100 / 99.6) * (pm - 150.4));
 }
 
 function aqiLabel(aqi) {
@@ -566,20 +758,23 @@ function updateClock() {
   const h = now.getHours(), m = now.getMinutes();
   const ampm = h >= 12 ? 'PM' : 'AM';
   const hh = h % 12 || 12;
+
   document.getElementById('clock').textContent = `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
   document.getElementById('dateStr').textContent =
     `${days[now.getDay()]} · ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 }
+
 setInterval(updateClock, 1000);
 updateClock();
 
-// ─── FETCH WEATHER (Open-Meteo, no key needed) ────────────
+// ─── FETCH WEATHER ────────────────────────────────────────
 async function fetchWeather() {
   const url = 'https://api.open-meteo.com/v1/forecast?latitude=46.5436&longitude=-87.3954'
     + '&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max'
     + '&hourly=temperature_2m,weather_code,precipitation_probability'
     + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure'
     + '&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch';
+
   const res = await fetch(url);
   if (!res.ok) throw new Error('Weather fetch failed');
   return res.json();
@@ -587,6 +782,7 @@ async function fetchWeather() {
 
 async function fetchAQ() {
   const url = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=46.5436&longitude=-87.3954&current=us_aqi,pm2_5,uv_index&timezone=America%2FNew_York';
+
   const res = await fetch(url);
   if (!res.ok) throw new Error('AQ fetch failed');
   return res.json();
@@ -616,6 +812,7 @@ function renderWeather(data, aqData) {
   const wdir = windDirLabel(c.wind_direction_10m);
   document.getElementById('windSpeed').textContent = `${wspd} mph`;
   document.getElementById('windDir').textContent = `From ${wdir} (${Math.round(c.wind_direction_10m)}°)`;
+
   const gusts = Math.round(c.wind_gusts_10m);
   document.getElementById('windGust').textContent = gusts > wspd + 5 ? `⚠ Gusts to ${gusts} mph` : '';
 
@@ -623,12 +820,14 @@ function renderWeather(data, aqData) {
   const rh = Math.round(c.relative_humidity_2m);
   document.getElementById('humidVal').textContent = `${rh}%`;
   document.getElementById('humidBar').style.width = `${rh}%`;
-  const dp = Math.round(c.temperature_2m - ((100-rh)/5));
+
+  const dp = Math.round(c.temperature_2m - ((100 - rh) / 5));
   document.getElementById('dewPt').textContent = `Dew point: ${dp}°F`;
 
   // Pressure
   const pInHg = toInHg(c.surface_pressure);
   document.getElementById('pressVal').textContent = `${pInHg} inHg`;
+
   const pMb = c.surface_pressure;
   document.getElementById('pressTrend').textContent =
     pMb > 1015 ? '↑ High pressure — stable' :
@@ -639,11 +838,14 @@ function renderWeather(data, aqData) {
   if (aqData && aqData.current) {
     const uv = Math.round(aqData.current.uv_index);
     const [uvLbl, , uvColor] = uvLabel(uv);
+
     document.getElementById('uvVal').textContent = uv;
+
     const uvPill = document.getElementById('uvPill');
     uvPill.textContent = uvLbl;
     uvPill.style.color = uvColor;
-    document.getElementById('uvBar').style.width = `${Math.min(uv/12*100,100)}%`;
+
+    document.getElementById('uvBar').style.width = `${Math.min(uv / 12 * 100, 100)}%`;
     document.getElementById('uvBar').style.background = uvColor;
   } else {
     document.getElementById('uvVal').textContent = 'N/A';
@@ -654,10 +856,13 @@ function renderWeather(data, aqData) {
     const aqi = Math.round(aqData.current.us_aqi || aqiFromPm25(aqData.current.pm2_5 || 0));
     const pm = (aqData.current.pm2_5 || 0).toFixed(1);
     const [aLabel, aPillClass] = aqiLabel(aqi);
+
     document.getElementById('aqiVal').textContent = aqi;
+
     const pill = document.getElementById('aqiPill');
     pill.textContent = aLabel;
     pill.className = `pill ${aPillClass}`;
+
     document.getElementById('aqiSub').textContent = `PM2.5: ${pm} μg/m³`;
   } else {
     document.getElementById('aqiVal').textContent = 'N/A';
@@ -668,14 +873,16 @@ function renderWeather(data, aqData) {
   const now = new Date();
   const h2 = now.getHours(), mm = now.getMinutes();
   const ap = h2 >= 12 ? 'PM' : 'AM';
+
   document.getElementById('lastUpdated').textContent =
-    `${h2%12||12}:${String(mm).padStart(2,'0')} ${ap}`;
+    `${h2 % 12 || 12}:${String(mm).padStart(2,'0')} ${ap}`;
 
   // Alert check
   const alertBanner = document.getElementById('alertBanner');
   const maxPop = Math.max(...d.precipitation_probability_max.slice(0,3));
   const hasSevere = d.weather_code.slice(0,3).some(w => w >= 95);
   const highWind = c.wind_gusts_10m > 35;
+
   if (hasSevere) {
     alertBanner.style.display = 'flex';
     document.getElementById('alertText').textContent =
@@ -692,33 +899,41 @@ function renderWeather(data, aqData) {
     alertBanner.style.display = 'none';
   }
 
-  // Hourly (next 8 hours)
+  // Hourly — next 8 hours
   const nowHour = new Date().getHours();
   const hrRow = document.getElementById('hourlyRow');
   let hrHtml = '';
   let count = 0;
+
   for (let i = 0; i < h.time.length && count < 8; i++) {
     const hDate = new Date(h.time[i]);
+
     if (hDate.getHours() >= nowHour || count > 0) {
       const [, em] = wmoLabel(h.weather_code[i]);
       const hh2 = hDate.getHours();
       const ap2 = hh2 >= 12 ? 'pm' : 'am';
       const label = hh2 % 12 || 12;
       const pop = h.precipitation_probability[i] || 0;
-      hrHtml += `<div class="hr-cell">
-        <div class="hr-time">${label}:00 ${ap2}</div>
-        <div class="hr-icon">${em}</div>
-        <div class="hr-temp">${Math.round(h.temperature_2m[i])}°</div>
-        ${pop > 10 ? `<div class="hr-pop">${pop}%</div>` : '<div class="hr-pop" style="color:transparent">0%</div>'}
-      </div>`;
+
+      hrHtml += `
+        <div class="hr-cell">
+          <div class="hr-time">${label}:00 ${ap2}</div>
+          <div class="hr-icon">${em}</div>
+          <div class="hr-temp">${Math.round(h.temperature_2m[i])}°</div>
+          ${pop > 10 ? `<div class="hr-pop">${pop}%</div>` : '<div class="hr-pop" style="color:transparent">0%</div>'}
+        </div>
+      `;
+
       count++;
     }
   }
+
   hrRow.innerHTML = hrHtml;
 
   // 7-Day Forecast
   const fcRow = document.getElementById('forecastRow');
   let fcHtml = '';
+
   for (let i = 0; i < 7; i++) {
     const fcDate = new Date(d.time[i] + 'T12:00:00');
     const dow = i === 0 ? 'Today' : days[fcDate.getDay()];
@@ -726,15 +941,19 @@ function renderWeather(data, aqData) {
     const [, fcEm] = wmoLabel(d.weather_code[i]);
     const pop = d.precipitation_probability_max[i] || 0;
     const popColor = pop >= 70 ? 'var(--red)' : pop >= 40 ? 'var(--accent)' : 'var(--blue)';
-    fcHtml += `<div class="fc ${i===0?'today':''}">
-      <div class="fc-dow">${dow}</div>
-      <div class="fc-date">${dateLabel}</div>
-      <div class="fc-icon">${fcEm}</div>
-      <div class="fc-hi">${Math.round(d.temperature_2m_max[i])}°</div>
-      <div class="fc-lo">${Math.round(d.temperature_2m_min[i])}°</div>
-      <div class="fc-pop" style="color:${pop>5?popColor:'var(--muted)'}">${pop>5?pop+'%':'—'}</div>
-    </div>`;
+
+    fcHtml += `
+      <div class="fc ${i === 0 ? 'today' : ''}">
+        <div class="fc-dow">${dow}</div>
+        <div class="fc-date">${dateLabel}</div>
+        <div class="fc-icon">${fcEm}</div>
+        <div class="fc-hi">${Math.round(d.temperature_2m_max[i])}°</div>
+        <div class="fc-lo">${Math.round(d.temperature_2m_min[i])}°</div>
+        <div class="fc-pop" style="color:${pop > 5 ? popColor : 'var(--muted)'}">${pop > 5 ? pop + '%' : '—'}</div>
+      </div>
+    `;
   }
+
   fcRow.innerHTML = fcHtml;
 }
 
@@ -742,9 +961,19 @@ function renderWeather(data, aqData) {
 async function loadAll() {
   try {
     document.getElementById('apiError').style.display = 'none';
-    const [wData, aqData] = await Promise.allSettled([fetchWeather(), fetchAQ()]);
+
+    const [wData, aqData] = await Promise.allSettled([
+      fetchWeather(),
+      fetchAQ()
+    ]);
+
     if (wData.status === 'rejected') throw wData.reason;
-    renderWeather(wData.value, aqData.status === 'fulfilled' ? aqData.value : null);
+
+    renderWeather(
+      wData.value,
+      aqData.status === 'fulfilled' ? aqData.value : null
+    );
+
     document.getElementById('loadingOverlay').classList.add('hidden');
   } catch (err) {
     console.error(err);
@@ -756,5 +985,7 @@ async function loadAll() {
 loadAll();
 setInterval(loadAll, REFRESH_MS);
 </script>
+
 </body>
 </html>
+``
